@@ -721,7 +721,7 @@ void WifiManagerBegin(bool reset_only) {
   DnsServer->setErrorReplyCode(DNSReplyCode::NoError);
   DnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
 
-  StartWebserver((reset_only ? HTTP_MANAGER_RESET_ONLY : HTTP_MANAGER));
+  StartWebserver((reset_only ? HTTP_MANAGER_RESET_ONLY : HTTP_ADMIN));
 }
 
 /*-------------------------------------------------------------------------------------------*/
