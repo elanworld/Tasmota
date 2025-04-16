@@ -108,10 +108,6 @@
 // Structs
 #include "include/tasmota_types.h"
 
-#ifdef USER_LOCAL_TIME
-#include "tasmota_support/local_timer.h"
-#endif
-
 /*********************************************************************************************\
  * Global variables
 \*********************************************************************************************/
@@ -441,10 +437,6 @@ void setup(void) {
   RtcPreInit();
   SettingsInit();
 
-#ifdef USER_LOCAL_TIME
-  TimerManager::init();
-#endif
-
 #ifdef USE_EMERGENCY_RESET
   EmergencyReset();
 #endif  // USE_EMERGENCY_RESET
@@ -717,6 +709,10 @@ void setup(void) {
   if (bitRead(Settings->rule_enabled, 0)) Run_Scripter(">BS",3,0);
 #endif  // USE_SCRIPT
 
+#ifdef USER_LOCAL_TIME
+  initTimerManager();
+#endif
+
   TasmotaGlobal.rules_flag.system_init = 1;
 }
 
@@ -841,6 +837,9 @@ void loop(void) {
 
   Scheduler();
 
+  #ifdef USER_LOCAL_TIME
+  // loadInLoop();
+  #endif
   uint32_t my_activity = millis() - my_sleep;
 
   if (Settings->flag3.sleep_normal) {              // SetOption60 - Enable normal sleep instead of dynamic sleep
@@ -864,6 +863,6 @@ void loop(void) {
   TasmotaGlobal.loop_load_avg = TasmotaGlobal.loop_load_avg - (TasmotaGlobal.loop_load_avg / loops_per_second) + (this_cycle_ratio / loops_per_second); // Take away one loop average away and add the new one
   
 #ifdef USER_LOCAL_TIME
-  TimerManager::loadInLoop();
+    loadInLoop();
 #endif
 }
