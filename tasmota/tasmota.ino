@@ -108,6 +108,10 @@
 // Structs
 #include "include/tasmota_types.h"
 
+#ifdef USER_LOCAL_TIME
+#include "tasmota_support/local_timer.h"
+#endif
+
 /*********************************************************************************************\
  * Global variables
 \*********************************************************************************************/
@@ -436,6 +440,10 @@ void setup(void) {
 
   RtcPreInit();
   SettingsInit();
+
+#ifdef USER_LOCAL_TIME
+  TimerManager::init();
+#endif
 
 #ifdef USE_EMERGENCY_RESET
   EmergencyReset();
@@ -854,4 +862,8 @@ void loop(void) {
   uint32_t loops_per_second = 1000 / loop_delay;   // We need to keep track of this many loops per second
   uint32_t this_cycle_ratio = 100 * my_activity / loop_delay;
   TasmotaGlobal.loop_load_avg = TasmotaGlobal.loop_load_avg - (TasmotaGlobal.loop_load_avg / loops_per_second) + (this_cycle_ratio / loops_per_second); // Take away one loop average away and add the new one
+  
+#ifdef USER_LOCAL_TIME
+  TimerManager::loadInLoop();
+#endif
 }
