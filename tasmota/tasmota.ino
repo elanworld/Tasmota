@@ -709,6 +709,10 @@ void setup(void) {
   if (bitRead(Settings->rule_enabled, 0)) Run_Scripter(">BS",3,0);
 #endif  // USE_SCRIPT
 
+#ifdef USER_LOCAL_TIME
+  initTimerManager();
+#endif
+
   TasmotaGlobal.rules_flag.system_init = 1;
 }
 
@@ -833,6 +837,9 @@ void loop(void) {
 
   Scheduler();
 
+  #ifdef USER_LOCAL_TIME
+  // loadInLoop();
+  #endif
   uint32_t my_activity = millis() - my_sleep;
 
   if (Settings->flag3.sleep_normal) {              // SetOption60 - Enable normal sleep instead of dynamic sleep
@@ -854,4 +861,8 @@ void loop(void) {
   uint32_t loops_per_second = 1000 / loop_delay;   // We need to keep track of this many loops per second
   uint32_t this_cycle_ratio = 100 * my_activity / loop_delay;
   TasmotaGlobal.loop_load_avg = TasmotaGlobal.loop_load_avg - (TasmotaGlobal.loop_load_avg / loops_per_second) + (this_cycle_ratio / loops_per_second); // Take away one loop average away and add the new one
+  
+#ifdef USER_LOCAL_TIME
+    loadInLoop();
+#endif
 }

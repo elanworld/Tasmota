@@ -36,7 +36,9 @@
 #define WIFI_RETRY_SECONDS      20         // Number of seconds connection to wifi network will retry
 #endif
 
-const uint8_t WIFI_CONFIG_SEC = 180;       // seconds before restart
+#ifndef WIFI_CONFIG_SEC
+const uint8_t WIFI_CONFIG_SEC = 60;       // seconds before restart
+#endif
 const uint8_t WIFI_CHECK_SEC = 20;         // seconds
 const uint8_t WIFI_RETRY_OFFSET_SEC = WIFI_RETRY_SECONDS;  // seconds
 

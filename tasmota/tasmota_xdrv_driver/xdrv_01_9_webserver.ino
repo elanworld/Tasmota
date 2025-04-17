@@ -475,7 +475,7 @@ const char kUploadErrors[] PROGMEM =
   D_UPLOAD_ERR_1 "|" D_UPLOAD_ERR_2 "|" D_UPLOAD_ERR_3 "|" D_UPLOAD_ERR_4 "| |" D_UPLOAD_ERR_6 "|" D_UPLOAD_ERR_7 "|" D_UPLOAD_ERR_8 "|" D_UPLOAD_ERR_9;
 
 const uint16_t DNS_PORT = 53;
-enum HttpOptions { HTTP_OFF, HTTP_USER, HTTP_ADMIN, HTTP_MANAGER, HTTP_MANAGER_RESET_ONLY };
+enum HttpOptions { HTTP_OFF, HTTP_USER, HTTP_ADMIN, HTTP_MANAGER, HTTP_MANAGER_RESET_ONLY, HTTP_MANAGER_USER };
 enum WebCmndStatus { WEBCMND_DONE, WEBCMND_WRONG_PARAMETERS, WEBCMND_CONNECT_FAILED, WEBCMND_HOST_NOT_FOUND, WEBCMND_MEMORY_ERROR, WEBCMND_VALID_RESPONSE
 #ifdef USE_WEBGETCONFIG
   ,WEBCMND_FILE_NOT_FOUND, WEBCMND_OTHER_HTTP_ERROR, WEBCMND_CONNECTION_LOST, WEBCMND_INVALID_FILE
@@ -727,7 +727,7 @@ void WifiManagerBegin(bool reset_only) {
   DnsServer->setErrorReplyCode(DNSReplyCode::NoError);
   DnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
 
-  StartWebserver((reset_only ? HTTP_MANAGER_RESET_ONLY : HTTP_MANAGER));
+  StartWebserver((reset_only ? HTTP_MANAGER_RESET_ONLY : HTTP_MANAGER_USER));
 }
 
 /*-------------------------------------------------------------------------------------------*/
@@ -1050,7 +1050,9 @@ void WSContentButton(uint32_t title_index, bool show=true) {
   WSContentSend_P(PSTR("<p><form id=but%d style=\"display: %s;\" action='%s' method='get'"),
     title_index,
     show ? "block":"none",
-    GetTextIndexed(action, sizeof(action), title_index, kButtonAction));
+    GetTextIndexed(action, sizeof(action), 
+    HTTP_MANAGER_USER == Web.state && title_index == BUTTON_CONFIGURATION ? BUTTON_MAIN : title_index, 
+    kButtonAction));
   if (title_index <= BUTTON_RESET_CONFIGURATION) {
     char confirm[100];
     WSContentSend_P(PSTR(" onsubmit='return confirm(\"%s\");'><button name='%s' class='button bred'>%s</button></form></p>"),
@@ -1648,6 +1650,9 @@ void HandleRoot(void) {
     }
 #endif  // Not FIRMWARE_MINIMAL
     WSContentButton(BUTTON_RESTART);
+  } else if (HTTP_MANAGER_USER == Web.state)
+  {
+    WSContentButton(BUTTON_WIFI);
   }
   WSContentStop();
 }
